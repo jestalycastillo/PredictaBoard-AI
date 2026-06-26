@@ -1,15 +1,24 @@
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 type AmazonProps = {
     time:string;
 }
 
 export default function Amazon({time}:AmazonProps):React.ReactElement{
+    const timeMap: Record<string, string> = {
+        'All Time': 'alltime',
+        '1 Year': 'year',
+        '1 Month': 'month',
+        '1 Week': 'week',
+    };
+    const window = timeMap[time] || 'alltime';
+
     return (
         <>
-            <iframe className="flex flex-col justify-center items-center h-[888px] w-screen bg-blue-100" 
-                    src={time === 'All Time' ? "../chart_visuals/AMZN_AT.html" : time === '1 Year' ? 
-                    "../chart_visuals/AMZN_Y.html" : time === '1 Month' ? 
-                    "../chart_visuals/AMZN_M.html": time === '1 Week' ? 
-                    "../chart_visuals/AMZN_WW.html" : "../chart_visuals/AMZN_AT.html"}/>
+            <iframe
+                className="flex flex-col justify-center items-center h-[888px] w-screen bg-blue-100"
+                src={`${API_URL}/chart/plotly/amazon/${window}`}
+            />
         </>
     )
 }
