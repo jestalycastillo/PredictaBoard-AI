@@ -40,15 +40,39 @@ export default function MainPanel({time, setTicker}:MainPanelProps): React.React
         setTicker(ticker);
     }
     
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
+    const TICKER_TO_STOCK: Record<string, string> = {
+        'AAPL': 'apple',
+        'AMZN': 'amazon',
+        'MSFT': 'microsoft',
+        'NVDA': 'nvidia',
+    };
+
+    const TIME_TO_WINDOW: Record<string, string> = {
+        'All Time': 'alltime',
+        '1 Year': 'year',
+        '1 Month': 'month',
+        '1 Week': 'week',
+    };
+
+    const getPlotUrl = (ticker: string | undefined, time: string): string | undefined => {
+        if (!ticker) return undefined;
+        const stock = TICKER_TO_STOCK[ticker];
+        if (!stock) return undefined;
+        const window = TIME_TO_WINDOW[time] || 'alltime';
+        return `${API_URL}/plot/window/${stock}/${window}`;
+    };
+
     useEffect(():void =>{
-        fetch('/analyze')
+        fetch(`${API_URL}/analyze`)
         }, []);
 
     const showFullChart = (ticker:string, time:string) => {
         // TODO: Fix how to add this in the flow
         if (ticker === 'AAPL'){
             if(time === 'All Time' || time === '1 Year' || time === '1 Month' || time === '1 Week'){
-                fetch('/stocks/apple')
+                fetch(`${API_URL}/stocks/apple`)
                 .then(res => res.json())
                 .then(data => {
                 setStockView({
@@ -72,7 +96,7 @@ export default function MainPanel({time, setTicker}:MainPanelProps): React.React
         }
         else if(ticker === 'AMZN'){
             if(time === 'All Time' || time === '1 Year' || time === '1 Month' || time === '1 Week'){
-                fetch('/stocks/amazon')
+                fetch(`${API_URL}/stocks/amazon`)
                 .then(res => res.json())
                 .then(data => {
                 setStockView({
@@ -96,7 +120,7 @@ export default function MainPanel({time, setTicker}:MainPanelProps): React.React
         }
         else if(ticker === 'MSFT'){
             if(time === 'All Time' || time === '1 Year' || time === '1 Month' || time === '1 Week'){
-                fetch('/stocks/microsoft')
+                fetch(`${API_URL}/stocks/microsoft`)
                 .then(res => res.json())
                 .then(data => {
                 setStockView({
@@ -120,7 +144,7 @@ export default function MainPanel({time, setTicker}:MainPanelProps): React.React
         }
         else if(ticker === 'NVDA'){
             if(time === 'All Time' || time === '1 Year' || time === '1 Month' || time === '1 Week'){
-                fetch('/stocks/nvidia')
+                fetch(`${API_URL}/stocks/nvidia`)
                 .then(res => res.json())
                 .then(data => {
                 setStockView({
@@ -193,23 +217,7 @@ export default function MainPanel({time, setTicker}:MainPanelProps): React.React
 
                 <div className='flex justify-evenly items-center h-1/2 w-full'>
                     <img className='h-full w-[760px] object-cover bg-gray-100 rounded-3xl cursor-pointer'
-                    src={(stockView?.ticker === 'AMZN' && time === 'All Time') ? 
-                    'svg_visuals/AMZN_AT_m.svg' : ((stockView?.ticker === 'AAPL' && time === 'All Time') ? 
-                    'svg_visuals/AAPL_AT_m.svg' : ((stockView?.ticker === 'MSFT' && time === 'All Time') ? 
-                    'svg_visuals/MSFT_AT_m.svg' : ((stockView?.ticker === 'NVDA' && time === 'All Time') ? 
-                    'svg_visuals/NVDA_AT_m.svg' : ((stockView?.ticker === 'AMZN' && time === '1 Year') ? 
-                    'svg_visuals/AMZN_Y_m.svg' : ((stockView?.ticker === 'AAPL' && time === '1 Year') ? 
-                    'svg_visuals/AAPL_Y_m.svg' : ((stockView?.ticker === 'MSFT' && time === '1 Year') ? 
-                    'svg_visuals/MSFT_Y_m.svg' : ((stockView?.ticker === 'NVDA' && time === '1 Year') ? 
-                    'svg_visuals/NVDA_Y_m.svg' : ((stockView?.ticker === 'AMZN' && time === '1 Month') ? 
-                    'svg_visuals/AMZN_M_m.svg' : ((stockView?.ticker === 'AAPL' && time === '1 Month') ? 
-                    'svg_visuals/AAPL_M_m.svg' : ((stockView?.ticker === 'MSFT' && time === '1 Month') ? 
-                    'svg_visuals/MSFT_M_m.svg' : ((stockView?.ticker === 'NVDA' && time === '1 Month') ? 
-                    'svg_visuals/NVDA_M_m.svg' : ((stockView?.ticker === 'AMZN' && time === '1 Week') ? 
-                    'svg_visuals/AMZN_WW_m.svg' : ((stockView?.ticker === 'AAPL' && time === '1 Week') ? 
-                    'svg_visuals/AAPL_WW_m.svg' : ((stockView?.ticker === 'MSFT' && time === '1 Week') ? 
-                    'svg_visuals/MSFT_WW_m.svg' : ((stockView?.ticker === 'NVDA' && time === '1 Week') ? 
-                    'svg_visuals/NVDA_WW_m.svg' : '')))))))))))))))}/>
+                    src={getPlotUrl(stockView?.ticker, time)}/>
 
                     <div className='flex flex-col justify-evenly items-center h-2/3 w-1/5'>
                         {/* Stock high/low price */}
@@ -252,23 +260,7 @@ export default function MainPanel({time, setTicker}:MainPanelProps): React.React
                 </div>
                 <div className='flex justify-start items-center h-1/3 w-full pl-3 pr-3'>
                      <img className='h-full w-[760px] object-cover bg-gray-100 rounded-3xl cursor-pointer'
-                    src={(stockView?.ticker === 'AMZN' && time === 'All Time') ? 
-                    'svg_visuals/AMZN_AT_m_RSI.svg' : ((stockView?.ticker === 'AAPL' && time === 'All Time') ? 
-                    'svg_visuals/AAPL_AT_m_RSI.svg' : ((stockView?.ticker === 'MSFT' && time === 'All Time') ? 
-                    'svg_visuals/MSFT_AT_m_RSI.svg' : ((stockView?.ticker === 'NVDA' && time === 'All Time') ? 
-                    'svg_visuals/NVDA_AT_m_RSI.svg' : ((stockView?.ticker === 'AMZN' && time === '1 Year') ? 
-                    'svg_visuals/AMZN_Y_m_RSI.svg' : ((stockView?.ticker === 'AAPL' && time === '1 Year') ? 
-                    'svg_visuals/AAPL_Y_m_RSI.svg' : ((stockView?.ticker === 'MSFT' && time === '1 Year') ? 
-                    'svg_visuals/MSFT_Y_m_RSI.svg' : ((stockView?.ticker === 'NVDA' && time === '1 Year') ? 
-                    'svg_visuals/NVDA_Y_m_RSI.svg' : ((stockView?.ticker === 'AMZN' && time === '1 Month') ? 
-                    'svg_visuals/AMZN_M_m_RSI.svg' : ((stockView?.ticker === 'AAPL' && time === '1 Month') ? 
-                    'svg_visuals/AAPL_M_m_RSI.svg' : ((stockView?.ticker === 'MSFT' && time === '1 Month') ? 
-                    'svg_visuals/MSFT_M_m_RSI.svg' : ((stockView?.ticker === 'NVDA' && time === '1 Month') ? 
-                    'svg_visuals/NVDA_M_m_RSI.svg' : ((stockView?.ticker === 'AMZN' && time === '1 Week') ? 
-                    'svg_visuals/AMZN_WW_m_RSI.svg' : ((stockView?.ticker === 'AAPL' && time === '1 Week') ? 
-                    'svg_visuals/AAPL_WW_m_RSI.svg' : ((stockView?.ticker === 'MSFT' && time === '1 Week') ? 
-                    'svg_visuals/MSFT_WW_m_RSI.svg' : ((stockView?.ticker === 'NVDA' && time === '1 Week') ? 
-                    'svg_visuals/NVDA_WW_m_RSI.svg' : '')))))))))))))))}/>
+                    src={getPlotUrl(stockView?.ticker, time)}/>
                 </div>
             </div>
 
@@ -279,10 +271,10 @@ export default function MainPanel({time, setTicker}:MainPanelProps): React.React
                     <Label text='Amazon.com, Inc.'/>
                     <div className="h-full w-2xl" onClick={():void => showFullChart('AMZN',time)}>
                         <img className='h-full w-full object-cover bg-gray-100 rounded-b-3xl rounded-tr-3xl cursor-pointer' 
-                        src={time === "All Time" ? "/plot/window/amazon/alltime" : 
-                        (time === "1 Year" ? "/plot/window/amazon/year" : 
-                        (time === "1 Month" ? "/plot/window/amazon/month" : 
-                        (time === "1 Week" ? "/plot/window/amazon/week" : "/plot/window/amazon/alltime")))}/>
+                        src={time === "All Time" ? `${API_URL}/plot/window/amazon/alltime` : 
+                        (time === "1 Year" ? `${API_URL}/plot/window/amazon/year` : 
+                        (time === "1 Month" ? `${API_URL}/plot/window/amazon/month` : 
+                        (time === "1 Week" ? `${API_URL}/plot/window/amazon/week` : `${API_URL}/plot/window/amazon/alltime`)))}/>
                     </div>
                 </div>
                 <div className='h-full flex flex-col justify-between items-start 
@@ -290,10 +282,10 @@ export default function MainPanel({time, setTicker}:MainPanelProps): React.React
                     <Label text='Apple Inc.'/>
                     <div className="h-full w-2xl" onClick={():void => showFullChart('AAPL',time)}>
                         <img className='h-full w-full object-cover bg-gray-100 rounded-b-3xl rounded-tr-3xl cursor-pointer' 
-                        src={time === "All Time" ? "/plot/window/apple/alltime": 
-                        (time === "1 Year" ? "/plot/window/apple/year" : 
-                        (time === "1 Month" ? "/plot/window/apple/month" : 
-                        (time === "1 Week" ? "/plot/window/apple/week" : "/plot/window/apple/alltime")))}/>
+                        src={time === "All Time" ? `${API_URL}/plot/window/apple/alltime`: 
+                        (time === "1 Year" ? `${API_URL}/plot/window/apple/year` : 
+                        (time === "1 Month" ? `${API_URL}/plot/window/apple/month` : 
+                        (time === "1 Week" ? `${API_URL}/plot/window/apple/week` : `${API_URL}/plot/window/apple/alltime`)))}/>
                     </div>
                 </div>
             </div>
@@ -305,10 +297,10 @@ export default function MainPanel({time, setTicker}:MainPanelProps): React.React
                     <Label text='Microsoft Corporation'/>
                     <div className="h-full w-2xl" onClick={():void => showFullChart('MSFT',time)}>
                         <img className='h-full w-full object-cover bg-gray-100 rounded-b-3xl rounded-tr-3xl cursor-pointer'
-                        src={time === "All Time" ? "/plot/window/microsoft/alltime": 
-                        (time === "1 Year" ? "/plot/window/microsoft/year": 
-                        (time === "1 Month" ? "/plot/window/microsoft/month" : 
-                        (time === "1 Week" ? "/plot/window/microsoft/week" : "/plot/window/microsoft/alltime")))}/>
+                        src={time === "All Time" ? `${API_URL}/plot/window/microsoft/alltime`: 
+                        (time === "1 Year" ? `${API_URL}/plot/window/microsoft/year`: 
+                        (time === "1 Month" ? `${API_URL}/plot/window/microsoft/month` : 
+                        (time === "1 Week" ? `${API_URL}/plot/window/microsoft/week` : `${API_URL}/plot/window/microsoft/alltime`)))}/>
                     </div>
                 </div>
                 <div className='h-full flex flex-col justify-between items-start 
@@ -316,10 +308,10 @@ export default function MainPanel({time, setTicker}:MainPanelProps): React.React
                     <Label text='NVIDIA Corporation'/>
                     <div className="h-full w-2xl" onClick={():void => showFullChart('NVDA',time)}>
                         <img className='h-full w-full object-cover bg-gray-100 rounded-b-3xl rounded-tr-3xl cursor-pointer'
-                        src={time === "All Time" ? "/plot/window/nvidia/alltime": 
-                        (time === "1 Year" ? "/plot/window/nvidia/year" : 
-                        (time === "1 Month" ? "/plot/window/nvidia/month" : 
-                        (time === "1 Week" ? "/plot/window/nvidia/week" : "/plot/window/nvidia/alltime")))}/>
+                        src={time === "All Time" ? `${API_URL}/plot/window/nvidia/alltime`: 
+                        (time === "1 Year" ? `${API_URL}/plot/window/nvidia/year` : 
+                        (time === "1 Month" ? `${API_URL}/plot/window/nvidia/month` : 
+                        (time === "1 Week" ? `${API_URL}/plot/window/nvidia/week` : `${API_URL}/plot/window/nvidia/alltime`)))}/>
                     </div>
                 </div>
             </div>
