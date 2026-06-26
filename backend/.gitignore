@@ -2,3 +2,5 @@
 /dist
 
 tsconfig.tsbuildinfo
+venv
+.env
